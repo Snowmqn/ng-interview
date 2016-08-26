@@ -1,4 +1,19 @@
 <h2>Students</h2>
+
+<input class="form-control" type="text" placeholder="Filter Students" ng-model="vm.studentFilter">
 <ul>
 	<li>Here are your students...</li>
+	<hr>
+	<li ng-repeat="student in vm.students | filter:vm.studentFilter">
+		<div ng-click="student.details = !student.details">
+			<div>{{student.FirstName}} {{student.LastName}}</div>
+			<div ng-show="student.details">
+				Id: {{student.Id}} <br>
+				Favorite Color: {{student.FavoriteColor}} <br>
+				Favorite Movie: {{student.FavoriteMovie}} <br>
+				Favorite Food:  {{student.FavoriteFood}}  <br>
+			</div>
+		</div>
+		<hr>
+	</li>
 </ul>

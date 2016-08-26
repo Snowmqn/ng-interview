@@ -5,21 +5,52 @@
 		.module('ngInterview.api.students')
 		.service('StudentsService', StudentsService);
 
-	StudentsService.$inject = [];
-	function StudentsService() {
+	StudentsService.$inject = ['$q', '$http'];
+	function StudentsService($q, $http) {
+
+		var studentsApiUrl = 'http://il-resume-api.azurewebsites.net/api/students';		
 
 		/**
 		 * Exposed functions
 		 */
-
-		this.getName = getName; // This function serves no purpose. It's just here as an example.
+		this.getStudents = getStudents;
 
 		/**
 		 * Implementations
 		 */
 
-		function getName() {
-			return 'studentsService';
+		function getStudents() {
+			var defer = $q.defer();
+			var counter = 0;
+			var maxAttempts = 3;
+
+			
+			function getData() {
+				$http({
+					method: 'GET',
+					url: studentsApiUrl
+				}).then(
+					function(result) {
+						if (result.data[0].Id) {
+							defer.resolve(result.data);
+						} else {
+							getData();
+							counter++;
+						};
+					}, 
+					function(err) {
+						if (err.status === 503 && counter < maxAttempts) {
+							getData();
+							counter++;
+						} else {
+							defer.reject(err);
+						}
+					});
+			};
+
+			getData();
+
+			return defer.promise;
 		}
 	}
 })();
